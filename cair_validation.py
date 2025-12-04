@@ -1,102 +1,63 @@
 import pandas as pd
-from w_heart import w_heart
+from w_heart import w_heart_v1_6
 
-# === CONFIGURATION ===
-CSV_PATH = "CVD Dataset.csv"   
+CSV_PATH = "CVD Dataset.csv"
+
 COLS = {
     "age":      "Age",
     "sex":      "Sex",
-    "smoking":  "Smoking Status",         # <— ключевой момент
+    "smoking":  "Smoking Status",         # <-- единственно верная колонка
     "bmi":      "BMI",
     "sbp":      "Systolic BP",
     "diabetes": "Diabetes Status",
     "family":   "Family History of CVD",
     "ldl":      "Estimated LDL (mg/dL)",
     "hdl":      "HDL (mg/dL)",
-    "tg":       "Total Cholesterol (mg/dL)",   # TG нет — используем общий холестерин
-    "crp":      None,                          # нет CRP — выключаем слой воспаления
-    "label":    "CVD Risk Level"               # можно потом переключать на Score
+    "tg":       "Total Cholesterol (mg/dL)",   # TG нет, используем общий холестерин
+    "crp":      None,
+    "label":    "CVD Risk Level"
 }
 
 print("=== COLS mapping used ===")
 print(COLS)
 
-
 def map_row(row):
-    """Преобразуем строку CAIR в параметры W-HEART без HRV (HRV отключён)."""
+    # smoking → numeric 0/1/2
+    smk_raw = str(row[COLS["smoking"]]).lower()
+    if "never" in smk_raw or smk_raw == "0": smoking = 0
+    elif "former" in smk_raw or smk_raw == "1": smoking = 1
+    else: smoking = 2
 
-    # пол
-    sex_val = row[COLS["sex"]]
-    if isinstance(sex_val, str):
-        male = sex_val.upper().startswith("M")
-    else:
-        male = bool(sex_val)
-
-    # курение
-    smk_raw = row[COLS["smoking"]]
-    # приведение к 0/1/2 без подгонок
-    if smk_raw in (0, "0", "None", "No"):
-        smoking = 0
-    elif smk_raw in (1, "1", "Former"):
-        smoking = 1
-    else:
-        smoking = 2
-
-    params = dict(
-        age       = int(row[COLS["age"]]),
-        male      = male,
-        smoking   = smoking,
-        bmi       = float(row[COLS["bmi"]]),
-        sbp       = int(row[COLS["sbp"]]),
-        diabetes  = bool(row[COLS["diabetes"]]),
-        family    = bool(row[COLS["family"]]),
-        hrv_now       = 50,   # HRV-слой отключён (нет данных)
-        hrv_30d_ago   = 50,
-        hrv_sd7d      = 0,
-        ldl       = float(row[COLS["ldl"]]) if pd.notna(row[COLS["ldl"]]) else None,
-        hdl       = float(row[COLS["hdl"]]) if pd.notna(row[COLS["hdl"]]) else None,
-        tg        = float(row[COLS["tg"]])  if pd.notna(row[COLS["tg"]])  else None,
-        crp       = float(row[COLS["crp"]]) if pd.notna(row[COLS["crp"]]) else None,
-    )
-    return params
+    return {
+        "age": int(row[COLS["age"]]),
+        "male": True if row[COLS["sex"]] in ["M", "Male", 1] else False,
+        "smoking": smoking,
+        "bmi": float(row[COLS["bmi"]]),
+        "sbp": int(row[COLS["sbp"]]),
+        "diabetes": True if row[COLS["diabetes"]] in [1, "Yes"] else False,
+        "family": True if row[COLS["family"]] in [1, "Yes"] else False,
+        "ldl": float(row[COLS["ldl"]]) if not pd.isna(row[COLS["ldl"]]) else None,
+        "hdl": float(row[COLS["hdl"]]),
+        "tg": float(row[COLS["tg"]]),
+        "crp": None
+    }
 
 def main():
-    print("\n=== W-HEART v1.6 — CAIR-CVD validation (no HRV layer) ===\n")
     df = pd.read_csv(CSV_PATH)
+    print("\n=== W-HEART v1.6 — CAIR-CVD validation (no HRV layer) ===\n")
 
     print("Columns in dataset:")
-    print(list(df.columns))
-    print("\nRows:", len(df))
-
-    # если в наборе есть целевая метка
-    has_label = COLS["label"] in df.columns
+    print(df.columns.tolist(), "\n")
 
     risks = []
-    labels = []
-
     for _, row in df.iterrows():
-        params = map_row(row)
-        res = w_heart(**params)
-        risks.append(res["risk"])
-        if has_label:
-            labels.append(int(row[COLS["label"]]))
+        p = map_row(row)
+        res = w_heart_v1_6(**p)
+        risks.append(res["risk_value"])
 
-    df["W_risk"] = risks
-
-    print("\nRisk summary:")
-    print(df["W_risk"].describe())
-
-    if has_label:
-        from sklearn.metrics import roc_auc_score
-        auc = roc_auc_score(labels, risks)
-        print(f"\nAUC vs label ({COLS['label']}): {auc:.4f}")
-    else:
-        print("\nNo label column found, AUC not computed.")
-
-    # сохраним файл с рисками рядом
-    out_name = "cair_with_wheart_risk.csv"
-    df.to_csv(out_name, index=False)
-    print(f"\nSaved: {out_name}")
+    print(f"Processed records: {len(risks)}")
+    print(f"Mean risk: {sum(risks)/len(risks):.4f}")
+    print("Validation complete.")
 
 if __name__ == "__main__":
     main()

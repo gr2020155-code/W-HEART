@@ -17,6 +17,9 @@ COLS = {
     "crp":      None,                          # нет в датасете — отключаем
     "label":    "CVD Risk Level"               # можно заменить на Score для теста
 }
+print("=== COLS mapping used ===")
+print(COLS)
+
 
 def map_row(row):
     """Преобразуем строку CAIR в параметры W-HEART без HRV (HRV отключён)."""

@@ -1,24 +1,23 @@
 import pandas as pd
-from w_heart import w_heart_v1_6
+from w_heart import w_heart
 from sklearn.metrics import roc_auc_score, confusion_matrix
 import numpy as np
 
 CSV_PATH = "CVD Dataset.csv"
 
-# === Маппинг колонок из твоего датасета ===
 COLS = {
     "age":      "Age",
     "sex":      "Sex",
-    "smoking":  "Smoking Status",          # Y/N → 2/0
+    "smoking":  "Smoking Status",
     "bmi":      "BMI",
     "sbp":      "Systolic BP",
-    "diabetes": "Diabetes Status",         # Y/N
-    "family":   "Family History of CVD",   # Y/N
+    "diabetes": "Diabetes Status",
+    "family":   "Family History of CVD",
     "ldl":      "Estimated LDL (mg/dL)",
     "hdl":      "HDL (mg/dL)",
-    "tg":       "Total Cholesterol (mg/dL)",  # прокси для триглицеридов (в датасете нет TG)
-    "crp":      None,                          # нет в датасете
-    "label":    "CVD Risk Level"               # HIGH / INTERMEDIARY / LOW
+    "tg":       "Total Cholesterol (mg/dL)",
+    "crp":      None,
+    "label":    "CVD Risk Level"
 }
 
 def safe_float(x, default=None):
@@ -53,9 +52,9 @@ def map_row(row):
         "family":     str(row[COLS["family"]]).strip().upper() == "Y",
         "ldl":        safe_float(row[COLS["ldl"]]),
         "hdl":        safe_float(row[COLS["hdl"]]),
-        "tg":         safe_float(row[COLS["tg"]]),   # прокси
+        "tg":         safe_float(row[COLS["tg"]]),
         "crp":        None,
-        "hrv_now":    50,        # дефолт — в датасете нет HRV
+        "hrv_now":    50,
         "hrv_30d_ago": 50,
         "hrv_sd7d":   None
     }
@@ -74,13 +73,12 @@ def main():
     for idx, row in df.iterrows():
         params = map_row(row)
 
-        # Метка: HIGH → 1, всё остальное → 0
         label_raw = str(row[COLS["label"]]).strip().upper()
         true_label = 1 if "HIGH" in label_raw else 0
         true_labels.append(true_label)
 
         try:
-            res = w_heart_v1_6(**params)
+            res = w_heart(**params)
             risk = res["risk"]
         except Exception as e:
             print(f"Ошибка в строке {idx}: {e}")
@@ -91,7 +89,6 @@ def main():
     results = np.array(results)
     true_labels = np.array(true_labels)
 
-    # === Метрики ===
     auc = roc_auc_score(true_labels, results)
     tn, fp, fn, tp = confusion_matrix(true_labels, (results >= 0.5).astype(int)).ravel()
 
@@ -112,3 +109,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

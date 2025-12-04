@@ -6,17 +6,18 @@ CSV_PATH = "CVD Dataset.csv"
 COLS = {
     "age":      "Age",
     "sex":      "Sex",
-    "smoking":  "Smoking Status",
+    "smoking":  "Smoking Status",         # <— ключевой момент
     "bmi":      "BMI",
     "sbp":      "Systolic BP",
     "diabetes": "Diabetes Status",
     "family":   "Family History of CVD",
     "ldl":      "Estimated LDL (mg/dL)",
     "hdl":      "HDL (mg/dL)",
-    "tg":       "Total Cholesterol (mg/dL)",   # TG нет, берём общий холестерин
-    "crp":      None,                          # нет в датасете — отключаем
-    "label":    "CVD Risk Level"               # можно заменить на Score для теста
+    "tg":       "Total Cholesterol (mg/dL)",   # TG нет — используем общий холестерин
+    "crp":      None,                          # нет CRP — выключаем слой воспаления
+    "label":    "CVD Risk Level"               # можно потом переключать на Score
 }
+
 print("=== COLS mapping used ===")
 print(COLS)
 

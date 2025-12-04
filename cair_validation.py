@@ -3,20 +3,19 @@ from w_heart import w_heart
 
 # === CONFIGURATION ===
 CSV_PATH = "CVD Dataset.csv"   
-
 COLS = {
-    "age":        "Age",
-    "sex":        "Sex",
-    "smoking":    "Smoking Status",            # <── исправлено
-    "bmi":        "BMI",
-    "sbp":        "Systolic BP",                # <── исправлено
-    "diabetes":   "Diabetes Status",            # <── исправлено
-    "family":     "Family History of CVD",      # <── исправлено
-    "ldl":        "Estimated LDL (mg/dL)",      # <── исправлено
-    "hdl":        "HDL (mg/dL)",                # <── исправлено
-    "tg":         "Total Cholesterol (mg/dL)",  # заменяем на доступный показатель
-    "crp":        None,                         # нет в датасете → отключаем
-    "label":      "CVD Risk Level"              # <── исправлено
+    "age":      "Age",
+    "sex":      "Sex",
+    "smoking":  "Smoking Status",
+    "bmi":      "BMI",
+    "sbp":      "Systolic BP",
+    "diabetes": "Diabetes Status",
+    "family":   "Family History of CVD",
+    "ldl":      "Estimated LDL (mg/dL)",
+    "hdl":      "HDL (mg/dL)",
+    "tg":       "Total Cholesterol (mg/dL)",   # TG нет, берём общий холестерин
+    "crp":      None,                          # нет в датасете — отключаем
+    "label":    "CVD Risk Level"               # можно заменить на Score для теста
 }
 
 def map_row(row):

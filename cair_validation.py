@@ -7,18 +7,17 @@ CSV_PATH = "CVD Dataset.csv"
 COLS = {
     "age":        "Age",
     "sex":        "Sex",
-    "smoking":    "Smoking Status",          
+    "smoking":    "Smoking Status",            # <── исправлено
     "bmi":        "BMI",
-    "sbp":        "Systolic BP",              
-    "diabetes":   "Diabetes Status",          
-    "family":     "Family History of CVD",    
-    "ldl":        "Estimated LDL (mg/dL)",    
-    "hdl":        "HDL (mg/dL)",              
-    "tg":         "Triglycerides",            
-    "crp":        "CRP",                      
-    "label":      "CVD Risk Level"            
+    "sbp":        "Systolic BP",                # <── исправлено
+    "diabetes":   "Diabetes Status",            # <── исправлено
+    "family":     "Family History of CVD",      # <── исправлено
+    "ldl":        "Estimated LDL (mg/dL)",      # <── исправлено
+    "hdl":        "HDL (mg/dL)",                # <── исправлено
+    "tg":         "Total Cholesterol (mg/dL)",  # заменяем на доступный показатель
+    "crp":        None,                         # нет в датасете → отключаем
+    "label":      "CVD Risk Level"              # <── исправлено
 }
-
 
 def map_row(row):
     """Преобразуем строку CAIR в параметры W-HEART без HRV (HRV отключён)."""

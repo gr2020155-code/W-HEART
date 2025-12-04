@@ -2,23 +2,23 @@ import pandas as pd
 from w_heart import w_heart
 
 # === CONFIGURATION ===
-CSV_PATH = "CVD Dataset.csv"   # переименуй под свой файл, если нужно
+CSV_PATH = "CVD Dataset.csv"   
 
-# Здесь можно будет подправить соответствие колонок под реальные имена
 COLS = {
-    "age":           "Age",          # возраст
-    "sex":           "Sex",          # 'M' / 'F' или 1/0
-    "smoking":       "Smoking",      # 0/1/2 или похожее
-    "bmi":           "BMI",
-    "sbp":           "SBP",
-    "diabetes":      "Diabetes",     # 0/1
-    "family":        "FamilyHistory",# 0/1
-    "ldl":           "LDL",
-    "hdl":           "HDL",
-    "tg":            "Triglycerides",
-    "crp":           "CRP",
-    "label":         "CVD"           # 0/1 — событие или диагноз, если есть
+    "age":        "Age",
+    "sex":        "Sex",
+    "smoking":    "Smoking Status",          
+    "bmi":        "BMI",
+    "sbp":        "Systolic BP",              
+    "diabetes":   "Diabetes Status",          
+    "family":     "Family History of CVD",    
+    "ldl":        "Estimated LDL (mg/dL)",    
+    "hdl":        "HDL (mg/dL)",              
+    "tg":         "Triglycerides",            
+    "crp":        "CRP",                      
+    "label":      "CVD Risk Level"            
 }
+
 
 def map_row(row):
     """Преобразуем строку CAIR в параметры W-HEART без HRV (HRV отключён)."""
